@@ -48,6 +48,20 @@ function extractNoun(text: string): string {
   return NOUNS.find(n => text.includes(n)) || "";
 }
 
+function extractSubjectFromText(text: string): string {
+  const stopWords = new Set([
+    'user', 'users', 'the', 'a', 'an', 'to', 'and', 'or', 'of', 'in', 'on',
+    'at', 'by', 'for', 'with', 'from', 'their', 'its', 'is', 'are', 'was',
+    'were', 'be', 'been', 'have', 'has', 'had', 'do', 'does', 'did', 'will',
+    'would', 'can', 'could', 'should', 'may', 'might', 'that', 'this', 'into',
+    'onto', 'up', 'out', 'over', 'about', 'after', 'before', 'through', 'then',
+    'how', 'what', 'when', 'where', 'which', 'who', 'my', 'your', 'his', 'her',
+    'they', 'opens', 'views', 'sees', 'goes', 'lands', 'arrives', 'gets', 'sets',
+  ]);
+  const words = text.toLowerCase().split(/\s+/);
+  return words.find(w => w.length > 3 && !stopWords.has(w) && !/^(lands?|opens?|views?|sees?|goes?|gets?|sets?)$/.test(w)) ?? "";
+}
+
 function classifyStep(text: string): StepInfo {
   const t = text.toLowerCase();
 
@@ -56,6 +70,12 @@ function classifyStep(text: string): StepInfo {
 
   if (/sign[\s-]?in|log[\s-]?in|login|authenticate/.test(t))
     return { category: "auth-login", subject: "account", verb: "sign in" };
+
+  if (/sign[\s-]?out|log[\s-]?out|logout|signout/.test(t))
+    return { category: "auth-login", subject: "session", verb: "sign out" };
+
+  if (/reset.*password|forgot.*password|password.*reset|recover.*account/.test(t))
+    return { category: "profile-edit", subject: "password", verb: "reset" };
 
   if (/verif|confirm.*email|email.*confirm/.test(t))
     return { category: "email-verify", subject: "email", verb: "verify" };
@@ -107,27 +127,27 @@ function classifyStep(text: string): StepInfo {
     return { category: "profile-edit", subject: subj, verb: "update" };
   }
 
-  if (/search|filter|browse|find|discover|explore/.test(t)) {
-    const subj = extractNoun(t) || "results";
-    return { category: "search", subject: subj, verb: "search" };
-  }
-
-  if (/land|arrive|redirect|navigate|goes? to|open|view|access|dashboard|home.*page|feed/.test(t)) {
-    const subj = /dashboard/.test(t) ? "dashboard" : /feed/.test(t) ? "feed" : /inbox/.test(t) ? "inbox" : /home/.test(t) ? "home" : extractNoun(t) || "page";
-    return { category: "navigation", subject: subj, verb: "view" };
-  }
-
   if (/delete|remov|archiv|clear/.test(t)) {
     const subj = extractNoun(t) || "item";
     return { category: "content-delete", subject: subj, verb: "delete" };
   }
 
-  if (/create|add|start|new/.test(t)) {
+  if (/create|add|start|new|build|make/.test(t)) {
     const subj = extractNoun(t) || "item";
     return { category: "content-create", subject: subj, verb: "create" };
   }
 
-  const subj = extractNoun(t) || "item";
+  if (/search|filter|browse|find|discover|explore/.test(t)) {
+    const subj = extractNoun(t) || "results";
+    return { category: "search", subject: subj, verb: "search" };
+  }
+
+  if (/land|arrive|redirect|navigate|goes? to|dashboard|home.*page|feed|timeline/.test(t)) {
+    const subj = /dashboard/.test(t) ? "dashboard" : /feed|timeline/.test(t) ? "feed" : /inbox/.test(t) ? "inbox" : /home/.test(t) ? "home" : extractNoun(t) || "page";
+    return { category: "navigation", subject: subj, verb: "view" };
+  }
+
+  const subj = extractNoun(t) || extractSubjectFromText(t) || "content";
   return { category: "generic", subject: subj, verb: "complete" };
 }
 
@@ -932,21 +952,75 @@ export function parseUserFlow(flowDescription: string): ParsedStep[] {
     const action = words.length <= 5
       ? words.map(w => cap(w)).join(" ")
       : words.slice(0, 4).map(w => cap(w)).join(" ") + "…";
-    return { action, context: cap(context.toLowerCase()), info };
+    return { action, context: cap(context), info };
   });
+}
+
+function getStateGeneratorsForCategory(category: StepCategory) {
+  switch (category) {
+    case "auth-signup":
+    case "auth-login":
+    case "email-verify":
+      return [genEmpty, genPrimaryError, genEdgeCase];
+
+    case "upload-media":
+    case "upload-file":
+    case "social-post":
+    case "social-comment":
+    case "social-react":
+    case "commerce-cart":
+    case "commerce-checkout":
+    case "commerce-subscribe":
+    case "messaging":
+      return [genEmpty, genPrimaryError, genEdgeCase];
+
+    case "search":
+    case "navigation":
+    case "profile-edit":
+    case "invite":
+    case "schedule":
+    case "content-create":
+    case "content-delete":
+      return [genEmpty, genPrimaryError, genEdgeCase];
+
+    default:
+      return [genEmpty, genPrimaryError, genSecondaryError, genEdgeCase];
+  }
+}
+
+function isStateApplicable(info: StepInfo, _state: State): boolean {
+  // States are generated specifically for the step's category, so they're
+  // always applicable. For generic steps, accept everything since the
+  // generators already use the extracted subject/verb.
+  return info.category !== "generic"
+    || true; // generic always passes — subject is baked into the generated text
+}
+
+function uniqueStates(states: State[]): State[] {
+  const map = new Map<string, State>();
+  states.forEach(state => {
+    if (!map.has(state.title)) {
+      map.set(state.title, state);
+    }
+  });
+  return Array.from(map.values());
 }
 
 export function generateFlowSteps(userFlow: string, tone: Tone): FlowSteps {
   const steps = parseUserFlow(userFlow);
 
-  return steps.map(step => ({
-    stepName: step.action,
-    stepDescription: step.context,
-    states: [
-      genEmpty(step.info, tone),
-      genPrimaryError(step.info, tone),
-      genSecondaryError(step.info, tone),
-      genEdgeCase(step.info, tone),
-    ],
-  }));
+  return steps.map(step => {
+    const candidates = getStateGeneratorsForCategory(step.info.category)
+      .map(gen => gen(step.info, tone))
+      .filter(state => isStateApplicable(step.info, state));
+
+    const filtered = uniqueStates(candidates).slice(0, 3);
+    const fallback = [genEmpty(step.info, tone), genPrimaryError(step.info, tone)];
+
+    return {
+      stepName: step.action,
+      stepDescription: step.context,
+      states: filtered.length ? filtered : fallback,
+    };
+  });
 }

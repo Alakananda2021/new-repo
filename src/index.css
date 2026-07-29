@@ -2,39 +2,89 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+}
+
 :root {
   --font-size: 16px;
-  --background: #ffffff;
-  --foreground: oklch(0.145 0 0);
-  --card: #ffffff;
-  --card-foreground: oklch(0.145 0 0);
-  --primary: #030213;
-  --primary-foreground: oklch(1 0 0);
-  --muted: #ececf0;
-  --muted-foreground: #717182;
-  --accent: #e9ebef;
-  --accent-foreground: #030213;
-  --destructive: #d4183d;
-  --border: rgba(0, 0, 0, 0.1);
-  --font-weight-medium: 500;
-  --font-weight-normal: 400;
-  --ring: oklch(0.708 0 0);
-  --radius: 0.625rem;
+
+  /* Ink surfaces */
+  --ink-950: #0a0b0f;
+  --ink-900: #101218;
+  --ink-800: #171a22;
+  --ink-700: #20242e;
+  --ink-600: #2b303c;
+
+  /* Text */
+  --text-hi: #eef0f4;
+  --text-mid: #a8afbd;
+  --text-low: #6b7282;
+
+  /* Accent (phosphor lime) */
+  --accent: #baf23c;
+  --accent-dim: #8fbf2c;
+
+  /* Semantic */
+  --danger: #ff6a6a;
+  --warning: #ffb454;
 }
 
 @layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    font-size: 16px;
+    color-scheme: dark;
+  }
+
   body {
-    background: white;
-    color: #111;
+    background: var(--ink-950);
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.045) 1px, transparent 0);
+    background-size: 28px 28px;
+    color: var(--text-hi);
+    font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     margin: 0;
   }
-  * {
-    box-sizing: border-box;
+
+  ::selection {
+    background: var(--accent);
+    color: var(--ink-950);
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--ink-950);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--ink-700);
+    border-radius: 999px;
+    border: 2px solid var(--ink-950);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--ink-600);
+  }
+
+  textarea:focus,
+  input:focus,
+  button:focus-visible {
+    outline: none;
   }
 }
 
-html {
-  font-size: 16px;
+@keyframes blink-caret {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.caret-blink {
+  animation: blink-caret 1s step-end infinite;
 }
