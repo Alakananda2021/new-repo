@@ -132,7 +132,11 @@ export function ResultsScreen() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 lg:grid lg:grid-cols-[180px_1fr] lg:gap-10">
+      <div
+        className={`max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 ${
+          visibleSteps.length > 1 ? "lg:grid lg:grid-cols-[180px_1fr] lg:gap-10" : ""
+        }`}
+      >
         {visibleSteps.length > 1 && (
           <aside className="hidden lg:block">
             <div className="sticky top-24">

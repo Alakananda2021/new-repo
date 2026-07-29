@@ -942,7 +942,8 @@ function genEdgeCase(info: StepInfo, tone: Tone): State {
 export function parseUserFlow(flowDescription: string): ParsedStep[] {
   // Word boundary on "then" prevents splitting words like "authentication"
   // Comma handles "step 1, step 2, step 3" style inputs
-  const delimiters = /→|->|\s+\bthen\b\s+|,\s*|\n/gi;
+  // Spaced hyphen handles "step 1 - step 2" without breaking words like "sign-up"
+  const delimiters = /→|->|\s+\bthen\b\s+|,\s*|\n|\s+-\s+/gi;
   const rawSteps = flowDescription.split(delimiters).filter(s => s.trim());
 
   return rawSteps.map(step => {

@@ -36,7 +36,7 @@ export function InputScreen() {
   }, []);
 
   const stepCount = useMemo(() => {
-    const parts = userFlow.split(/→|->|\s+\bthen\b\s+|,\s*|\n/gi).filter((s) => s.trim());
+    const parts = userFlow.split(/→|->|\s+\bthen\b\s+|,\s*|\n|\s+-\s+/gi).filter((s) => s.trim());
     return parts.length;
   }, [userFlow]);
 
