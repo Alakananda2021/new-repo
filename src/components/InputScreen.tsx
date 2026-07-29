@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
-import { ArrowRight, Clock, Terminal } from "lucide-react";
+import { ArrowRight, Clock, Sparkles, Terminal } from "lucide-react";
 import { SYNTHETIC_FLOWS } from "../data/syntheticFlows";
 
 const EXAMPLE_IDS = ["ec-001", "so-001", "pr-001", "hc-001", "ft-001", "fd-001", "tr-001", "ed-001"];
@@ -74,6 +74,26 @@ export function InputScreen() {
           Turn any user flow into empty states, errors, and edge cases.
         </p>
 
+        <div className="mb-6 sm:mb-8">
+          <div className="flex items-center gap-1.5 mb-3 justify-center sm:justify-start">
+            <Sparkles className="w-3.5 h-3.5 text-[var(--accent)]" />
+            <span className="font-mono text-xs sm:text-sm text-[var(--text-hi)]">
+              Not sure where to start? Try an example
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
+            {EXAMPLES.map((example) => (
+              <button
+                key={example.id}
+                onClick={() => setUserFlow(example.steps.join(" → "))}
+                className="text-xs sm:text-sm px-3 py-1.5 rounded-lg border border-[var(--accent)]/25 bg-[var(--accent)]/10 text-[var(--text-hi)] hover:border-[var(--accent)]/60 hover:bg-[var(--accent)]/15 transition-colors"
+              >
+                {example.flowName}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="rounded-xl border border-[var(--ink-600)] bg-[var(--ink-900)] focus-within:border-[var(--accent)]/60 transition-colors overflow-hidden">
           <div className="flex items-center gap-2 px-4 py-2 border-b border-[var(--ink-700)]">
             <span className="w-2.5 h-2.5 rounded-full bg-[var(--ink-700)]" />
@@ -132,23 +152,6 @@ export function InputScreen() {
             </div>
           </div>
         )}
-
-        <div className="mt-8 sm:mt-10 pt-8 sm:pt-10 border-t border-[var(--ink-700)]">
-          <p className="font-mono text-xs text-[var(--text-low)] mb-3 text-center sm:text-left">
-            or try an example
-          </p>
-          <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
-            {EXAMPLES.map((example) => (
-              <button
-                key={example.id}
-                onClick={() => setUserFlow(example.steps.join(" → "))}
-                className="text-xs sm:text-sm px-3 py-1.5 rounded-lg border border-[var(--ink-700)] bg-[var(--ink-900)] text-[var(--text-mid)] hover:border-[var(--accent)]/40 hover:text-[var(--text-hi)] transition-colors"
-              >
-                {example.flowName}
-              </button>
-            ))}
-          </div>
-        </div>
       </div>
     </div>
   );
