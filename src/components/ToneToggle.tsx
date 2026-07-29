@@ -13,11 +13,12 @@ export function ToneToggle({ value, onChange }: ToneToggleProps) {
   ];
 
   return (
-    <div className="inline-flex bg-[var(--ink-900)] border border-[var(--ink-700)] rounded-lg p-1 w-full sm:w-auto font-mono">
+    <div role="group" aria-label="Tone" className="inline-flex bg-[var(--ink-900)] border border-[var(--ink-700)] rounded-lg p-1 w-full sm:w-auto font-mono">
       {options.map((option) => (
         <button
           key={option.value}
           onClick={() => onChange(option.value)}
+          aria-pressed={value === option.value}
           className={`flex-1 sm:flex-initial px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-md transition-all ${
             value === option.value
               ? "bg-[var(--accent)] text-[var(--ink-950)]"

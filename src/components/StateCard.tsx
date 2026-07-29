@@ -102,8 +102,9 @@ export function StateCard({ state }: StateCardProps) {
     >
       <button
         onClick={handleCopyAsImage}
-        className="copy-button absolute top-4 right-4 z-10 p-2 bg-[var(--ink-800)]/90 backdrop-blur-sm border border-[var(--ink-600)] rounded-lg opacity-0 group-hover:opacity-100 hover:border-[var(--accent)]/40 transition-all shadow-sm"
+        aria-label={copied ? "Copied as image" : "Copy as image"}
         title="Copy as image"
+        className="copy-button absolute top-4 right-4 z-10 p-2 bg-[var(--ink-800)]/90 backdrop-blur-sm border border-[var(--ink-600)] rounded-lg opacity-0 group-hover:opacity-100 focus-visible:opacity-100 hover:border-[var(--accent)]/40 transition-all shadow-sm"
       >
         {copied ? (
           <Check className="w-4 h-4 text-[var(--accent)]" />
@@ -127,9 +128,9 @@ export function StateCard({ state }: StateCardProps) {
         </p>
 
         {state.cta && (
-          <button className="text-xs sm:text-sm font-medium text-[var(--accent)] hover:brightness-110 transition-all">
+          <span className="block text-xs sm:text-sm font-medium text-[var(--accent)]">
             {state.cta} →
-          </button>
+          </span>
         )}
       </div>
 

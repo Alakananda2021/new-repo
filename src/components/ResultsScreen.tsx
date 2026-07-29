@@ -114,11 +114,12 @@ export function ResultsScreen() {
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-2 mt-6">
+          <div role="group" aria-label="Filter by state type" className="flex flex-wrap gap-2 mt-6">
             {FILTERS.map((f) => (
               <button
                 key={f.value}
                 onClick={() => setFilter(f.value)}
+                aria-pressed={filter === f.value}
                 className={`font-mono text-xs px-2.5 py-1 rounded-md border transition-colors ${
                   filter === f.value
                     ? "bg-[var(--accent)] text-[var(--ink-950)] border-[var(--accent)]"

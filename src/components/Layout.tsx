@@ -43,6 +43,8 @@ export function Layout() {
             <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm">
               <button
                 onClick={() => setPanelOpen((v) => !v)}
+                aria-expanded={panelOpen}
+                aria-controls="how-it-works-panel"
                 className="font-mono text-[var(--text-mid)] hover:text-[var(--text-hi)] transition-colors px-2 py-1"
               >
                 how it works
@@ -64,6 +66,9 @@ export function Layout() {
               exit={{ opacity: 0 }}
             />
             <motion.div
+              id="how-it-works-panel"
+              role="region"
+              aria-label="How it works"
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
@@ -73,6 +78,7 @@ export function Layout() {
               <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10 relative">
                 <button
                   onClick={() => setPanelOpen(false)}
+                  aria-label="Close how it works panel"
                   className="absolute top-6 right-4 sm:right-6 p-1.5 rounded-md text-[var(--text-mid)] hover:text-[var(--text-hi)] hover:bg-[var(--ink-800)] transition-colors"
                 >
                   <X className="w-4 h-4" />

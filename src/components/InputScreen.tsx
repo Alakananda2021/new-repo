@@ -94,6 +94,9 @@ export function InputScreen() {
           </div>
         </div>
 
+        <label htmlFor="flow-input" className="sr-only">
+          Describe your user flow
+        </label>
         <div className="rounded-xl border border-[var(--ink-600)] bg-[var(--ink-900)] focus-within:border-[var(--accent)]/60 transition-colors overflow-hidden">
           <div className="flex items-center gap-2 px-4 py-2 border-b border-[var(--ink-700)]">
             <span className="w-2.5 h-2.5 rounded-full bg-[var(--ink-700)]" />
@@ -102,16 +105,18 @@ export function InputScreen() {
             <span className="ml-2 font-mono text-xs text-[var(--text-low)]">flow.txt</span>
           </div>
           <textarea
+            id="flow-input"
             value={userFlow}
             onChange={(e) => setUserFlow(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="User signs up → verifies email → lands on dashboard"
-            className="w-full h-36 sm:h-40 px-4 sm:px-5 py-3 sm:py-4 text-sm sm:text-base font-mono text-[var(--text-hi)] placeholder-[var(--text-low)] bg-transparent focus:outline-none resize-none"
+            aria-describedby="flow-hint"
+            className="w-full h-36 sm:h-40 px-4 sm:px-5 py-3 sm:py-4 text-sm sm:text-base font-mono text-[var(--text-hi)] placeholder-[var(--text-low)] bg-transparent resize-none"
           />
-          <div className="flex items-center justify-between px-4 sm:px-5 py-2.5 border-t border-[var(--ink-700)] font-mono text-xs text-[var(--text-low)]">
+          <div id="flow-hint" className="flex items-center justify-between px-4 sm:px-5 py-2.5 border-t border-[var(--ink-700)] font-mono text-xs text-[var(--text-low)]">
             <span>
               {isTooShort ? (
-                <span className="text-[var(--warning)]">keep going — describe at least one full step</span>
+                <span className="text-[var(--warning)]" role="status">keep going — describe at least one full step</span>
               ) : (
                 "separate steps with → , or a new line"
               )}
