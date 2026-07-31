@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { ArrowRight, Clock, Sparkles } from "lucide-react";
 import { SYNTHETIC_FLOWS } from "../data/syntheticFlows";
+import { parseUserFlow } from "../utils/flowParser";
 
 const EXAMPLE_IDS = ["ec-001", "so-001", "pr-001", "hc-001", "ft-001", "fd-001", "tr-001", "ed-001"];
 const EXAMPLES = EXAMPLE_IDS
@@ -36,10 +37,7 @@ export function InputScreen() {
     setRecents(loadRecents());
   }, []);
 
-  const stepCount = useMemo(() => {
-    const parts = userFlow.split(/→|->|\s+\bthen\b\s+|,\s*|\n|\s+-\s+/gi).filter((s) => s.trim());
-    return parts.length;
-  }, [userFlow]);
+  const stepCount = useMemo(() => parseUserFlow(userFlow).length, [userFlow]);
 
   const isTooShort = userFlow.trim().length > 0 && userFlow.trim().length < 10;
   const canGenerate = userFlow.trim().length >= 10;
@@ -69,7 +67,8 @@ export function InputScreen() {
   };
 
   return (
-    <div className="px-4 sm:px-6 py-16 sm:py-24">
+    <div>
+      <div className="px-4 sm:px-6 py-16 sm:py-24">
       <div className="max-w-2xl mx-auto">
         <div className="flex justify-center mb-6">
           <div className="inline-flex items-center gap-2 rounded-full bg-[var(--accent-soft)] text-[var(--accent-hover)] text-xs sm:text-sm font-medium px-3.5 py-1.5">
@@ -196,6 +195,37 @@ export function InputScreen() {
           </div>
         </div>
       </div>
+      </div>
+
+      <section className="bg-[var(--text-hi)] text-white px-4 sm:px-6 py-16 sm:py-20 mt-8">
+        <div className="max-w-2xl mx-auto text-center">
+          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mb-3">
+            Stop designing for the demo.
+          </h2>
+          <p className="text-white/70 mb-8">Find your edge cases in the next two minutes — free, no account needed.</p>
+          <button
+            onClick={focusInput}
+            className="inline-flex items-center gap-2 bg-[var(--accent)] text-white font-semibold py-3 px-6 rounded-xl hover:brightness-110 transition-all text-sm sm:text-base"
+          >
+            Generate my edge cases
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+      </section>
+
+      <footer className="bg-[var(--text-hi)] text-white/60 px-4 sm:px-6 py-6 border-t border-white/10">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm">
+          <span>© 2026 Edgecase</span>
+          <a
+            href="https://github.com/Alakananda2021/new-repo"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-white transition-colors"
+          >
+            GitHub
+          </a>
+        </div>
+      </footer>
     </div>
   );
 }
