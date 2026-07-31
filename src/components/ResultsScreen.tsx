@@ -47,11 +47,11 @@ export function ResultsScreen() {
     return { totalCount: all.length, criticalCount: all.filter((s) => s.type === "error").length };
   }, [flowSteps]);
 
-  const handleEditFlow = () => navigate('/app');
+  const handleEditFlow = () => navigate('/');
 
   const handleNewFlow = () => {
     sessionStorage.removeItem('userFlow');
-    navigate('/app');
+    navigate('/');
   };
 
   const handleExport = async () => {

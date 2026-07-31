@@ -48,11 +48,6 @@ function extractNoun(text: string): string {
   return NOUNS.find(n => text.includes(n)) || "";
 }
 
-// Avoids "resultss" when a subject noun (e.g. "results") is already plural.
-function pluralize(word: string): string {
-  return word.endsWith("s") ? word : `${word}s`;
-}
-
 function extractSubjectFromText(text: string): string {
   const stopWords = new Set([
     'user', 'users', 'the', 'a', 'an', 'to', 'and', 'or', 'of', 'in', 'on',
@@ -220,11 +215,11 @@ function genEmpty(info: StepInfo, tone: Tone): State {
 
     case "upload-media":
       return makeState(
-        p(tone, `No ${pluralize(subject)} uploaded yet`, `Your ${subject} gallery is empty`, `${subject.toUpperCase()}_NOT_FOUND`),
+        p(tone, `No ${subject}s uploaded yet`, `Your ${subject} gallery is empty`, `${subject.toUpperCase()}_NOT_FOUND`),
         p(tone,
           `Upload your first ${subject} to get started.`,
           `Your ${subject} gallery is a blank canvas. Upload something and make it pop!`,
-          `Zero ${pluralize(subject)}. The gallery stares back, empty and judgmental. Feed it.`
+          `Zero ${subject}s. The gallery stares back, empty and judgmental. Feed it.`
         ),
         "empty", "upload-zone",
         p(tone, `Upload ${subject}`, `Add a ${subject}`, `Summon ${subject}`)
@@ -232,11 +227,11 @@ function genEmpty(info: StepInfo, tone: Tone): State {
 
     case "upload-file":
       return makeState(
-        p(tone, `No ${pluralize(subject)} attached`, `Nothing here yet`, `FILE_VOID`),
+        p(tone, `No ${subject}s attached`, `Nothing here yet`, `FILE_VOID`),
         p(tone,
-          `No ${pluralize(subject)} have been uploaded. Attach one to proceed.`,
+          `No ${subject}s have been uploaded. Attach one to proceed.`,
           `This is looking pretty empty! Drop a ${subject} in to get things moving.`,
-          `No ${pluralize(subject)} detected. The upload zone waits, hollow and hungry.`
+          `No ${subject}s detected. The upload zone waits, hollow and hungry.`
         ),
         "empty", "upload-zone",
         p(tone, `Attach ${subject}`, `Drop a ${subject}`, `Feed the void`)
@@ -244,11 +239,11 @@ function genEmpty(info: StepInfo, tone: Tone): State {
 
     case "social-post":
       return makeState(
-        p(tone, `No ${pluralize(subject)} yet`, `Nothing posted yet`, `POST_COUNT: 0`),
+        p(tone, `No ${subject}s yet`, `Nothing posted yet`, `POST_COUNT: 0`),
         p(tone,
-          `You haven't published any ${pluralize(subject)}. Create your first one to get started.`,
+          `You haven't published any ${subject}s. Create your first one to get started.`,
           `Your profile is fresh and quiet. Write your first ${subject} and break the silence!`,
-          `Zero ${pluralize(subject)}. Either you're very private or you haven't started yet. Both valid.`
+          `Zero ${subject}s. Either you're very private or you haven't started yet. Both valid.`
         ),
         "empty", "post-feed-empty",
         p(tone, `Write a ${subject}`, `Post something`, `Scream into void`)
@@ -268,26 +263,26 @@ function genEmpty(info: StepInfo, tone: Tone): State {
 
     case "social-react":
       return makeState(
-        p(tone, `No ${pluralize(subject)} followed yet`, `Your list is empty`, `FOLLOWING: NULL`),
+        p(tone, `No ${subject}s followed yet`, `Your list is empty`, `FOLLOWING: NULL`),
         p(tone,
-          `You're not following any ${pluralize(subject)} yet. Explore to find some.`,
-          `Your following list is as empty as a Monday morning. Go find some ${pluralize(subject)}!`,
-          `Following list: barren. Desolate. A wasteland of unfollowed ${pluralize(subject)}.`
+          `You're not following any ${subject}s yet. Explore to find some.`,
+          `Your following list is as empty as a Monday morning. Go find some ${subject}s!`,
+          `Following list: barren. Desolate. A wasteland of unfollowed ${subject}s.`
         ),
         "empty", "empty-list",
-        p(tone, `Find ${pluralize(subject)} to follow`, `Let's explore`, `Populate the void`)
+        p(tone, `Find ${subject}s to follow`, `Let's explore`, `Populate the void`)
       );
 
     case "commerce-cart":
       return makeState(
         p(tone, "Your cart is empty", "Nothing in your cart yet!", "CART: VOID"),
         p(tone,
-          `Add ${pluralize(subject)} to your cart to get started.`,
-          `Your cart is lonely! Add some ${pluralize(subject)} and treat yourself.`,
+          `Add ${subject}s to your cart to get started.`,
+          `Your cart is lonely! Add some ${subject}s and treat yourself.`,
           `Cart contains: nothing. Absolute zero. The capitalist void awaits your participation.`
         ),
         "empty", "cart-empty",
-        p(tone, `Browse ${pluralize(subject)}`, `Shop now`, `Feed the cart`)
+        p(tone, `Browse ${subject}s`, `Shop now`, `Feed the cart`)
       );
 
     case "commerce-checkout":
@@ -316,10 +311,10 @@ function genEmpty(info: StepInfo, tone: Tone): State {
 
     case "search":
       return makeState(
-        p(tone, `No ${pluralize(subject)} found`, "No results match your search", "RESULTS: []"),
+        p(tone, `No ${subject}s found`, "No results match your search", "RESULTS: []"),
         p(tone,
-          `We couldn't find any ${pluralize(subject)} matching your search. Try different keywords.`,
-          `Hmm, no ${pluralize(subject)} found! Try a different search—maybe it's hiding?`,
+          `We couldn't find any ${subject}s matching your search. Try different keywords.`,
+          `Hmm, no ${subject}s found! Try a different search—maybe it's hiding?`,
           `Search returned nothing. Either it doesn't exist or your spelling is creative.`
         ),
         "empty", "search-no-results",
@@ -364,11 +359,11 @@ function genEmpty(info: StepInfo, tone: Tone): State {
 
     case "schedule":
       return makeState(
-        p(tone, `No upcoming ${pluralize(subject)}`, `Your calendar is clear`, `${pluralize(subject).toUpperCase()}: NONE`),
+        p(tone, `No upcoming ${subject}s`, `Your calendar is clear`, `${subject.toUpperCase()}S: NONE`),
         p(tone,
-          `You have no upcoming ${pluralize(subject)} scheduled. Book one to get started.`,
+          `You have no upcoming ${subject}s scheduled. Book one to get started.`,
           `Your calendar is gloriously empty! Or terrifyingly empty. Book a ${subject}?`,
-          `No ${pluralize(subject)}. The calendar is a void. Time moves, but nothing is scheduled.`
+          `No ${subject}s. The calendar is a void. Time moves, but nothing is scheduled.`
         ),
         "empty", "calendar-empty",
         p(tone, `Book a ${subject}`, `Schedule now`, `Populate the timeline`)
@@ -376,9 +371,9 @@ function genEmpty(info: StepInfo, tone: Tone): State {
 
     case "content-create":
       return makeState(
-        p(tone, `No ${pluralize(subject)} yet`, `Your ${subject} list is empty`, `${subject.toUpperCase()}_COUNT: 0`),
+        p(tone, `No ${subject}s yet`, `Your ${subject} list is empty`, `${subject.toUpperCase()}_COUNT: 0`),
         p(tone,
-          `You haven't created any ${pluralize(subject)} yet. Create your first one to get started.`,
+          `You haven't created any ${subject}s yet. Create your first one to get started.`,
           `Empty ${subject} list—the possibilities are endless! Create your first one.`,
           `${subject.toUpperCase()} list is empty. The void awaits your creative contributions.`
         ),
@@ -388,9 +383,9 @@ function genEmpty(info: StepInfo, tone: Tone): State {
 
     case "content-delete":
       return makeState(
-        p(tone, `No ${pluralize(subject)} to delete`, `Nothing here to remove`, `DELETE_TARGET: NULL`),
+        p(tone, `No ${subject}s to delete`, `Nothing here to remove`, `DELETE_TARGET: NULL`),
         p(tone,
-          `There are no ${pluralize(subject)} available to delete.`,
+          `There are no ${subject}s available to delete.`,
           `Nothing to delete here—this place is already squeaky clean!`,
           `Nothing to delete. Either it's already gone or it never existed. Schrödinger's ${subject}.`
         ),
@@ -949,22 +944,7 @@ export function parseUserFlow(flowDescription: string): ParsedStep[] {
   // Comma handles "step 1, step 2, step 3" style inputs
   // Spaced hyphen handles "step 1 - step 2" without breaking words like "sign-up"
   const delimiters = /→|->|\s+\bthen\b\s+|,\s*|\n|\s+-\s+/gi;
-  const split = flowDescription.split(delimiters).map(s => s.trim()).filter(Boolean);
-
-  // Commas are ambiguous: "signs up, verifies email" is two steps, but
-  // "selects size, color, and quantity" is one step with a comma-separated
-  // list. A fragment of two words or fewer is almost never a real step on
-  // its own — fold it back into the step before it instead of surfacing it
-  // as a bogus standalone step (e.g. "Color", "And Quantity").
-  const rawSteps: string[] = [];
-  for (const fragment of split) {
-    const isShortFragment = fragment.split(/\s+/).length <= 2 && rawSteps.length > 0;
-    if (isShortFragment) {
-      rawSteps[rawSteps.length - 1] += `, ${fragment}`;
-    } else {
-      rawSteps.push(fragment);
-    }
-  }
+  const rawSteps = flowDescription.split(delimiters).filter(s => s.trim());
 
   return rawSteps.map(step => {
     const context = step.trim();
