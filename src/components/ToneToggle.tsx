@@ -7,13 +7,13 @@ interface ToneToggleProps {
 
 export function ToneToggle({ value, onChange }: ToneToggleProps) {
   const options: { value: Tone; label: string }[] = [
-    { value: "professional", label: "professional" },
-    { value: "playful", label: "playful" },
-    { value: "chaotic", label: "chaotic" },
+    { value: "professional", label: "Professional" },
+    { value: "playful", label: "Playful" },
+    { value: "chaotic", label: "Chaotic" },
   ];
 
   return (
-    <div role="group" aria-label="Tone" className="inline-flex bg-[var(--ink-900)] border border-[var(--ink-700)] rounded-lg p-1 w-full sm:w-auto font-mono">
+    <div role="group" aria-label="Tone" className="inline-flex bg-[var(--neutral-soft)] border border-[var(--border)] rounded-lg p-1 w-full sm:w-auto">
       {options.map((option) => (
         <button
           key={option.value}
@@ -21,7 +21,7 @@ export function ToneToggle({ value, onChange }: ToneToggleProps) {
           aria-pressed={value === option.value}
           className={`flex-1 sm:flex-initial px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-md transition-all ${
             value === option.value
-              ? "bg-[var(--accent)] text-[var(--ink-950)]"
+              ? "bg-white text-[var(--text-hi)] shadow-sm"
               : "text-[var(--text-mid)] hover:text-[var(--text-hi)]"
           }`}
         >
