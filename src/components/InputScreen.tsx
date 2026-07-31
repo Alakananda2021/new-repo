@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { ArrowRight, Clock, Sparkles } from "lucide-react";
 import { SYNTHETIC_FLOWS } from "../data/syntheticFlows";
+import { parseUserFlow } from "../utils/flowParser";
 
 const EXAMPLE_IDS = ["ec-001", "so-001", "pr-001", "hc-001", "ft-001", "fd-001", "tr-001", "ed-001"];
 const EXAMPLES = EXAMPLE_IDS
@@ -36,10 +37,7 @@ export function InputScreen() {
     setRecents(loadRecents());
   }, []);
 
-  const stepCount = useMemo(() => {
-    const parts = userFlow.split(/→|->|\s+\bthen\b\s+|,\s*|\n|\s+-\s+/gi).filter((s) => s.trim());
-    return parts.length;
-  }, [userFlow]);
+  const stepCount = useMemo(() => parseUserFlow(userFlow).length, [userFlow]);
 
   const isTooShort = userFlow.trim().length > 0 && userFlow.trim().length < 10;
   const canGenerate = userFlow.trim().length >= 10;
@@ -58,7 +56,7 @@ export function InputScreen() {
     if (!canGenerate) return;
     saveRecent(userFlow.trim());
     sessionStorage.setItem("userFlow", userFlow.trim());
-    navigate("/loading");
+    navigate("/app/loading");
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {

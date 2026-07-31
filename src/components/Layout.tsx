@@ -23,14 +23,14 @@ const HOW_IT_WORKS = [
 
 export function Layout() {
   const location = useLocation();
-  const isResultsScreen = location.pathname === "/results";
+  const isResultsScreen = location.pathname === "/app/results";
   const [panelOpen, setPanelOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-[var(--bg-page)] text-[var(--text-hi)]">
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-[var(--border)]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2.5 group">
+          <Link to="/app" className="flex items-center gap-2.5 group">
             <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[var(--text-hi)] flex items-center justify-center text-white text-sm font-semibold group-hover:bg-[var(--accent)] transition-colors">
               {"{}"}
             </div>

@@ -15,7 +15,7 @@ export function LoadingScreen() {
 
   useEffect(() => {
     const messageTimer = setTimeout(() => setStatusIndex(1), DURATION_MS / 2);
-    const navTimer = setTimeout(() => navigate("/results"), DURATION_MS);
+    const navTimer = setTimeout(() => navigate("/app/results"), DURATION_MS);
     return () => {
       clearTimeout(messageTimer);
       clearTimeout(navTimer);
