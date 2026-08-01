@@ -24,6 +24,7 @@ export function ResultsScreen() {
   const [exported, setExported] = useState(false);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const storedFlow = sessionStorage.getItem('userFlow') || "User signs up → verifies email → lands on dashboard";
     setUserFlowInput(storedFlow);
     setFlowSteps(generateFlowSteps(storedFlow, tone));
