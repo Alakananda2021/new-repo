@@ -64,7 +64,16 @@ function extractSubjectFromText(text: string): string {
     'they', 'opens', 'views', 'sees', 'goes', 'lands', 'arrives', 'gets', 'sets',
   ]);
   const words = text.toLowerCase().split(/\s+/);
-  return words.find(w => w.length > 3 && !stopWords.has(w) && !/^(lands?|opens?|views?|sees?|goes?|gets?|sets?)$/.test(w)) ?? "";
+  const isCandidate = (w: string) =>
+    w.length > 3 && !stopWords.has(w) && !/^(lands?|opens?|views?|sees?|goes?|gets?|sets?)$/.test(w);
+  // Search from the end, not the start: English verb phrases put the object
+  // noun last ("take a WALK", "share fitness GOAL"), while the front is
+  // almost always the verb itself ("TAKE a walk") — a bad subject to reuse
+  // in copy like "No {subject} yet".
+  for (let i = words.length - 1; i >= 0; i--) {
+    if (isCandidate(words[i])) return words[i];
+  }
+  return "";
 }
 
 function classifyStep(text: string): StepInfo {
@@ -952,15 +961,18 @@ export function parseUserFlow(flowDescription: string): ParsedStep[] {
   const strongDelimiters = /→|->|\s+\bthen\b\s+|\n|\s+-\s+/gi;
   const segments = flowDescription.split(strongDelimiters).map(s => s.trim()).filter(Boolean);
 
-  // Commas are ambiguous: "signs up, verifies email" is two steps, but
-  // "selects size, color, and quantity" is one step with a comma-separated
-  // list. Only fold a comma fragment back into the step before it when it
-  // looks like a bare list item rather than its own step — a single word
-  // ("color"), or an "and …" tail ("and quantity") — so real short steps
-  // like "sign in" or "pay ticket" (split on -> above) are never touched.
+  // Commas and "and" are both ambiguous: "signs up, verifies email" and
+  // "take a walk and record steps" are each two steps, but "selects size,
+  // color, and quantity" is one step with a comma-separated list. Only fold
+  // a fragment back into the step before it when it looks like a bare list
+  // item rather than its own step — a single word ("color"), or an "and …"
+  // tail left over from a comma split ("and quantity") — so real short
+  // steps like "sign in" or "pay ticket" (split on -> above) are untouched,
+  // and multi-word clauses after "and" ("record step count") become their
+  // own steps rather than getting absorbed into the previous one.
   const rawSteps: string[] = [];
   for (const segment of segments) {
-    const commaParts = segment.split(/,\s*/).filter(Boolean);
+    const commaParts = segment.split(/,\s*|\s+\band\b\s+/gi).filter(Boolean);
     commaParts.forEach((fragment, i) => {
       const words = fragment.split(/\s+/);
       // Only a comma-continuation (i > 0) can be a list item — the first
