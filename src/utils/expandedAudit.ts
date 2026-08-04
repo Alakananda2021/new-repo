@@ -190,9 +190,17 @@ function accessibilityFindingsFor(category: StepCategory): FindingDef[] {
 
 // ─── AI relevance detection ────────────────────────────────────────────────────
 
-const AI_PATTERN = /\b(ai|artificial intelligence|assistant|chatbot|chat bot|recommend(?:ation|s|ed)?|suggest(?:ion|s|ed)?|predict(?:ion|s|ed)?|generat(?:e|es|ed|ion)|summari[sz](?:e|es|ation)?|analy[sz]e[sd]?|personali[sz](?:e|ed|ation)|smart|auto-?complete|machine learning|\bml\b|algorithm)\b/i;
+// Deliberately errs toward over-matching, not under-matching: a false
+// positive here just surfaces a dismissible suggestion, while a false
+// negative silently hides a real gap. Covers common inflections (plurals,
+// -s/-es/-ed/-ing forms) since real flow descriptions rarely use a keyword's
+// bare dictionary form — "personalizes" and "summary" both used to slip
+// through a pattern that only recognized "personalize" and "summarize."
+const AI_PATTERN =
+  /\b(ai|artificial intelligence|assistant|chatbot|chat bot|bot|recommend(?:ation|ations|s|ed|ing)?|suggest(?:ion|ions|s|ed|ing)?|predict(?:ion|ions|s|ed|ing)?|generat(?:e|es|ed|ing|ion|ions)|summar(?:y|ies|i[sz](?:e|es|ed|ing|ation))|analy[sz](?:e|es|ed|ing|sis)|personali[sz](?:e|es|ed|ing|ation)|customi[sz](?:e|es|ed|ing|ation)|smart|auto-?complete|auto-?generat(?:e|es|ed|ing)|automat(?:e|es|ed|ically|ing|ion)|machine learning|\bml\b|algorithm(?:ically)?|intelligent|insight(?:s)?|detect(?:s|ed|ing|ion)?|extract(?:s|ed|ing|ion)?|transcri(?:be|bes|bed|bing|ption)|translat(?:e|es|ed|ing|ion)|learn(?:s|ed|ing)?|model)\b/i;
 
-const SENSITIVE_DATA_PATTERN = /\b(photo|image|picture|selfie|document|file|message|chat|location|health|medical|financial|payment|contacts?|camera|microphone|voice|recording|personal|biometric|face|data)\b/i;
+const SENSITIVE_DATA_PATTERN =
+  /\b(photo(?:s)?|image(?:s)?|picture(?:s)?|selfie(?:s)?|video(?:s)?|document(?:s)?|file(?:s)?|message(?:s)?|chat(?:s)?|location(?:s)?|health|medical|financial|payment(?:s)?|contacts?|camera(?:s)?|microphone(?:s)?|voice(?:s)?|recording(?:s)?|personal|biometric(?:s)?|face(?:s)?|profile(?:s)?|resume(?:s)?|address(?:es)?|identity|information|data)\b/i;
 
 const CONSENT_PATTERN = /\b(consent|permission|allow|agree|opt-?in)\b/i;
 const FAILURE_PATTERN = /\b(fail|error|timeout|retry|unavailable|fallback|down|outage)\b/i;
