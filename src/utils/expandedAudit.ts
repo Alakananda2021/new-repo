@@ -205,11 +205,20 @@ const SENSITIVE_DATA_PATTERN =
 const CONSENT_PATTERN = /\b(consent|permission|allow|agree|opt-?in)\b/i;
 const FAILURE_PATTERN = /\b(fail|error|timeout|retry|unavailable|fallback|down|outage)\b/i;
 
+// Narrower than AI_PATTERN — gates the conversational-only findings below
+// (context window, streaming, empty prompt) so they don't fire on AI steps
+// that aren't actually a back-and-forth prompt/response interaction, e.g.
+// "AI recommends products" or "AI analyzes the photo."
+const CONVERSATIONAL_PATTERN = /\b(chat(?:s|bot)?|assistant|conversation(?:s|al)?|prompt(?:s|ed|ing)?|ask(?:s|ed|ing)?|messag(?:e|es|ing)|dialog(?:ue)?|talk(?:s|ed|ing)?|reply|replies)\b/i;
+
 function isAIRelevant(text: string): boolean {
   return AI_PATTERN.test(text);
 }
 function hasSensitiveData(text: string): boolean {
   return SENSITIVE_DATA_PATTERN.test(text);
+}
+function isConversational(text: string): boolean {
+  return CONVERSATIONAL_PATTERN.test(text);
 }
 
 // ─── AI Journey: Microsoft HAX / Google PAIR-grounded ─────────────────────────
@@ -238,6 +247,60 @@ const AI_JOURNEY_FINDINGS: FindingDef[] = [
     description: (subject) => `Users have no way to understand what drove ${subject} — a one-line reason goes a long way toward trust.`,
     why: "Google PAIR's explainability pattern and HAX Guideline 11 — unexplained AI output is a leading driver of user distrust.",
     impact: 3, confidence: 3, ease: 2,
+  },
+  {
+    title: "No disclaimer that AI output can be wrong",
+    description: (subject) => `${subject} is presented without any indication that AI-generated content can be inaccurate or fabricated.`,
+    why: "Both Google PAIR and Microsoft HAX call for setting accurate expectations about failure modes — presenting AI output as verified fact is one of the most common AI UX mistakes, and the root cause of most \"the AI lied to me\" complaints.",
+    impact: 4, confidence: 3, ease: 2,
+  },
+  {
+    title: "No state for the AI being completely unavailable",
+    description: (subject) => `If the model or service behind ${subject} is down, nothing in this step accounts for it.`,
+    why: "AI services have real, non-trivial downtime — HAX Guideline 1 (set accurate expectations) implicitly requires a plan for the system being unreachable, not just slow.",
+    impact: 4, confidence: 3, ease: 3,
+  },
+  {
+    title: "No state for hitting usage or rate limits",
+    description: (subject) => `Nothing here handles what happens when ${subject} is throttled or a usage cap is hit.`,
+    why: "Rate limiting is standard on AI APIs for cost and abuse control but routinely missing from designed flows — without a state for it, the feature just silently stops working.",
+    impact: 3, confidence: 3, ease: 3,
+  },
+  {
+    title: "No fallback for unusually long AI response times",
+    description: (subject) => `A normal loading state covers the first second or two — nothing here addresses ${subject} taking far longer than expected.`,
+    why: "AI latency is highly variable and occasionally spikes well past typical response times; without a distinct \"this is taking longer than usual\" state, users assume the app broke and abandon the flow.",
+    impact: 3, confidence: 3, ease: 3,
+  },
+  {
+    title: "No state for when the AI declines to help",
+    description: (subject) => `${subject} has no designed response for requests the AI refuses on safety or policy grounds.`,
+    why: "Moderation refusals are a normal, expected part of any AI feature — an undesigned refusal reads as a broken interaction instead of an intentional safety boundary.",
+    impact: 3, confidence: 2, ease: 3,
+  },
+];
+
+// Only shown for steps that read as an actual back-and-forth prompt/response
+// interaction (see isConversational) — these don't make sense for e.g. a
+// recommendation engine or a one-shot photo analysis.
+const AI_JOURNEY_CONVERSATIONAL_FINDINGS: FindingDef[] = [
+  {
+    title: "No handling for an empty or blank prompt",
+    description: (subject) => `Nothing stops or guides someone who tries to use ${subject} without typing anything.`,
+    why: "A commonly overlooked edge case in conversational AI — submitting nothing should give clear guidance, not a confusing empty response or a silent failure.",
+    impact: 3, confidence: 4, ease: 4,
+  },
+  {
+    title: "No indication if a streaming response is interrupted or still in progress",
+    description: (subject) => `If ${subject} streams its answer token by token, nothing shows whether it's still generating, finished, or got cut off.`,
+    why: "Streaming is now the default pattern for conversational AI — it cuts perceived wait time significantly, but only when paired with a clear in-progress/complete/interrupted signal.",
+    impact: 3, confidence: 3, ease: 3,
+  },
+  {
+    title: "No handling for hitting the conversation length limit",
+    description: (subject) => `Long conversations with ${subject} will eventually exceed the model's context window — nothing here plans for that.`,
+    why: "Every model has a hard limit on how much conversation history it can hold — without a designed state, users experience this as the AI suddenly \"forgetting\" earlier context with no explanation.",
+    impact: 3, confidence: 2, ease: 2,
   },
 ];
 
@@ -336,6 +399,12 @@ export function runExpandedAudit(steps: ParsedStep[]): ExpandedAudit {
       AI_JOURNEY_FINDINGS.forEach((def) => {
         aiJourney.push(makeItem("ai-journey", def, subject, i, step.action));
       });
+
+      if (isConversational(context)) {
+        AI_JOURNEY_CONVERSATIONAL_FINDINGS.forEach((def) => {
+          aiJourney.push(makeItem("ai-journey", def, subject, i, step.action));
+        });
+      }
 
       if (hasSensitiveData(context)) {
         AI_PERMISSIONS_FINDINGS.forEach((def) => {
