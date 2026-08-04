@@ -946,24 +946,34 @@ function genEdgeCase(info: StepInfo, tone: Tone): State {
 
 export function parseUserFlow(flowDescription: string): ParsedStep[] {
   // Word boundary on "then" prevents splitting words like "authentication"
-  // Comma handles "step 1, step 2, step 3" style inputs
   // Spaced hyphen handles "step 1 - step 2" without breaking words like "sign-up"
-  const delimiters = /→|->|\s+\bthen\b\s+|,\s*|\n|\s+-\s+/gi;
-  const split = flowDescription.split(delimiters).map(s => s.trim()).filter(Boolean);
+  // Comma is intentionally excluded here — it's handled separately below,
+  // since unlike these, it's ambiguous (see comment).
+  const strongDelimiters = /→|->|\s+\bthen\b\s+|\n|\s+-\s+/gi;
+  const segments = flowDescription.split(strongDelimiters).map(s => s.trim()).filter(Boolean);
 
   // Commas are ambiguous: "signs up, verifies email" is two steps, but
   // "selects size, color, and quantity" is one step with a comma-separated
-  // list. A fragment of two words or fewer is almost never a real step on
-  // its own — fold it back into the step before it instead of surfacing it
-  // as a bogus standalone step (e.g. "Color", "And Quantity").
+  // list. Only fold a comma fragment back into the step before it when it
+  // looks like a bare list item rather than its own step — a single word
+  // ("color"), or an "and …" tail ("and quantity") — so real short steps
+  // like "sign in" or "pay ticket" (split on -> above) are never touched.
   const rawSteps: string[] = [];
-  for (const fragment of split) {
-    const isShortFragment = fragment.split(/\s+/).length <= 2 && rawSteps.length > 0;
-    if (isShortFragment) {
-      rawSteps[rawSteps.length - 1] += `, ${fragment}`;
-    } else {
-      rawSteps.push(fragment);
-    }
+  for (const segment of segments) {
+    const commaParts = segment.split(/,\s*/).filter(Boolean);
+    commaParts.forEach((fragment, i) => {
+      const words = fragment.split(/\s+/);
+      // Only a comma-continuation (i > 0) can be a list item — the first
+      // part of a segment always came from an unambiguous strong delimiter
+      // (or is the start of the whole flow) and is always its own step.
+      const looksLikeListItem =
+        i > 0 && rawSteps.length > 0 && (words.length === 1 || /^and\s+/i.test(fragment));
+      if (looksLikeListItem) {
+        rawSteps[rawSteps.length - 1] += `, ${fragment}`;
+      } else {
+        rawSteps.push(fragment);
+      }
+    });
   }
 
   return rawSteps.map(step => {

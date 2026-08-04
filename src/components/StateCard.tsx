@@ -20,7 +20,7 @@ import {
   Wifi,
   X,
 } from "lucide-react";
-import html2canvas from "html2canvas";
+import html2canvas from "html2canvas-pro";
 
 interface StateCardProps {
   state: State;
