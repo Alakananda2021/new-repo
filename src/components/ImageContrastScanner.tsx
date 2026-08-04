@@ -80,7 +80,7 @@ export function ImageContrastScanner() {
   };
 
   return (
-    <div className="rounded-xl border border-[var(--border)] bg-[var(--neutral-soft)] p-4 sm:p-5 mb-4">
+    <div id="image-contrast-scanner" className="rounded-xl border border-[var(--border)] bg-[var(--neutral-soft)] p-4 sm:p-5 mb-4 scroll-mt-24">
       <h3 className="font-semibold text-[var(--text-hi)] text-sm sm:text-base mb-1">
         Check contrast on your actual design
       </h3>

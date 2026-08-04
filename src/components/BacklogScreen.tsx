@@ -4,6 +4,7 @@ import { ArrowLeft, Check, Copy, Accessibility, Sparkles, ShieldCheck, Lightbulb
 import { parseUserFlow } from "../utils/flowParser";
 import { runExpandedAudit, type BacklogCategory, type BacklogItem } from "../utils/expandedAudit";
 import { BacklogItemCard } from "./BacklogItemCard";
+import { ImageContrastScanner } from "./ImageContrastScanner";
 
 type FilterType = "all" | BacklogCategory;
 
@@ -64,7 +65,12 @@ export function BacklogScreen() {
     setTimeout(() => setExported(false), 2000);
   };
 
+  const handleVerifyClick = () =>
+    document.getElementById("image-contrast-scanner")?.scrollIntoView({ behavior: "smooth", block: "center" });
+
   if (!audit) return null;
+
+  const hasVerifiableItems = audit.all.some((i) => i.verifiable);
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-[var(--bg-page)]">
@@ -145,6 +151,8 @@ export function BacklogScreen() {
       </div>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        {hasVerifiableItems && <ImageContrastScanner />}
+
         {visibleItems.length === 0 ? (
           <div className="text-center py-16 sm:py-24">
             <p className="text-sm text-[var(--text-mid)]">No findings in this category for this flow.</p>
@@ -152,7 +160,7 @@ export function BacklogScreen() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
             {visibleItems.map((item) => (
-              <BacklogItemCard key={item.id} item={item} showCategory />
+              <BacklogItemCard key={item.id} item={item} showCategory onVerifyClick={handleVerifyClick} />
             ))}
           </div>
         )}

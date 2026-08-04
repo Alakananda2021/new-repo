@@ -265,6 +265,9 @@ export function ResultsScreen() {
                 description="WCAG-grounded findings, matched to each step's UI pattern"
                 items={audit.accessibility}
                 beforeItems={<ImageContrastScanner />}
+                onItemVerifyClick={() =>
+                  document.getElementById("image-contrast-scanner")?.scrollIntoView({ behavior: "smooth", block: "center" })
+                }
               />
               <AuditSection
                 id="ai-journey-findings"

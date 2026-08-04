@@ -1,5 +1,5 @@
 import type { BacklogItem, BacklogCategory, Severity } from "../utils/expandedAudit";
-import { Accessibility, Sparkles, ShieldCheck, Lightbulb } from "lucide-react";
+import { Accessibility, Sparkles, ShieldCheck, Lightbulb, Upload } from "lucide-react";
 
 const CATEGORY_STYLES: Record<BacklogCategory, { badge: string; icon: typeof Accessibility; label: string }> = {
   accessibility: { badge: "bg-blue-500/10 text-blue-700 border-blue-500/20", icon: Accessibility, label: "Accessibility" },
@@ -17,9 +17,10 @@ const SEVERITY_STYLES: Record<Severity, string> = {
 interface BacklogItemCardProps {
   item: BacklogItem;
   showCategory?: boolean;
+  onVerifyClick?: () => void;
 }
 
-export function BacklogItemCard({ item, showCategory = false }: BacklogItemCardProps) {
+export function BacklogItemCard({ item, showCategory = false, onVerifyClick }: BacklogItemCardProps) {
   const cat = CATEGORY_STYLES[item.category];
   const Icon = cat.icon;
 
@@ -57,6 +58,16 @@ export function BacklogItemCard({ item, showCategory = false }: BacklogItemCardP
           {item.why}
         </p>
       </div>
+
+      {item.verifiable && onVerifyClick && (
+        <button
+          onClick={onVerifyClick}
+          className="mt-3 inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors"
+        >
+          <Upload className="w-3.5 h-3.5" />
+          Verify with a screenshot
+        </button>
+      )}
     </div>
   );
 }

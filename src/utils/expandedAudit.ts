@@ -18,6 +18,7 @@ export interface BacklogItem {
   ease: number;
   stepIndex?: number;
   stepName?: string;
+  verifiable?: boolean;
 }
 
 interface FindingDef {
@@ -27,6 +28,7 @@ interface FindingDef {
   impact: number; // 1-5, how much this affects users/legal risk/trust if left unaddressed
   confidence: number; // 1-5, how sure we are this applies given the step's text
   ease: number; // 1-5, how straightforward this is to design/implement
+  verifiable?: boolean; // true if the in-app image contrast scanner can actually check this
 }
 
 // Weighted rather than multiplied — a pure Impact x Confidence x Ease
@@ -67,6 +69,7 @@ function makeItem(
     ease: def.ease,
     stepIndex,
     stepName,
+    verifiable: def.verifiable,
   };
 }
 
@@ -171,7 +174,7 @@ const A11Y_GENERIC: FindingDef[] = [
     title: "Color contrast on this step hasn't been verified",
     description: () => "Check text and interactive elements here against a 4.5:1 (text) / 3:1 (large text, icons, borders) contrast ratio.",
     why: "WCAG 2.1 SC 1.4.3 (Contrast Minimum, AA) — flagged generically since this step's pattern wasn't specific enough to target a known issue.",
-    impact: 4, confidence: 1, ease: 3,
+    impact: 4, confidence: 1, ease: 3, verifiable: true,
   },
 ];
 

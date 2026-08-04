@@ -12,9 +12,10 @@ interface AuditSectionProps {
   accentClass: string;
   defaultOpen?: boolean;
   beforeItems?: ReactNode;
+  onItemVerifyClick?: () => void;
 }
 
-export function AuditSection({ id, icon, title, description, items, accentClass, defaultOpen = false, beforeItems }: AuditSectionProps) {
+export function AuditSection({ id, icon, title, description, items, accentClass, defaultOpen = false, beforeItems, onItemVerifyClick }: AuditSectionProps) {
   const [open, setOpen] = useState(defaultOpen);
   const highCount = items.filter((i) => i.severity === "high").length;
 
@@ -53,7 +54,7 @@ export function AuditSection({ id, icon, title, description, items, accentClass,
           {beforeItems}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
             {items.map((item) => (
-              <BacklogItemCard key={item.id} item={item} />
+              <BacklogItemCard key={item.id} item={item} onVerifyClick={onItemVerifyClick} />
             ))}
           </div>
         </div>
