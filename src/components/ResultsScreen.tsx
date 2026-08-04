@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, Check, Copy, Pencil, Accessibility, Sparkles, Sh
 import { ToneToggle } from "./ToneToggle";
 import { StateCard } from "./StateCard";
 import { AuditSection } from "./AuditSection";
+import { ImageContrastScanner } from "./ImageContrastScanner";
 import type { State, Tone, FlowSteps } from "../data/states";
 import { generateFlowSteps, parseUserFlow } from "../utils/flowParser";
 import { runExpandedAudit } from "../utils/expandedAudit";
@@ -263,6 +264,7 @@ export function ResultsScreen() {
                 title="Accessibility"
                 description="WCAG-grounded findings, matched to each step's UI pattern"
                 items={audit.accessibility}
+                beforeItems={<ImageContrastScanner />}
               />
               <AuditSection
                 id="ai-journey-findings"

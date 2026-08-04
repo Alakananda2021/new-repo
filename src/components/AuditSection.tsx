@@ -11,9 +11,10 @@ interface AuditSectionProps {
   items: BacklogItem[];
   accentClass: string;
   defaultOpen?: boolean;
+  beforeItems?: ReactNode;
 }
 
-export function AuditSection({ id, icon, title, description, items, accentClass, defaultOpen = false }: AuditSectionProps) {
+export function AuditSection({ id, icon, title, description, items, accentClass, defaultOpen = false, beforeItems }: AuditSectionProps) {
   const [open, setOpen] = useState(defaultOpen);
   const highCount = items.filter((i) => i.severity === "high").length;
 
@@ -48,10 +49,13 @@ export function AuditSection({ id, icon, title, description, items, accentClass,
       </button>
 
       {open && (
-        <div id={`${id}-content`} className="px-4 sm:px-6 pb-5 sm:pb-6 grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
-          {items.map((item) => (
-            <BacklogItemCard key={item.id} item={item} />
-          ))}
+        <div id={`${id}-content`} className="px-4 sm:px-6 pb-5 sm:pb-6">
+          {beforeItems}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+            {items.map((item) => (
+              <BacklogItemCard key={item.id} item={item} />
+            ))}
+          </div>
         </div>
       )}
     </section>
