@@ -2,7 +2,7 @@ import type { Tone, FlowSteps, State, PreviewVariant } from "../data/states";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type StepCategory =
+export type StepCategory =
   | "auth-signup" | "auth-login" | "email-verify"
   | "upload-media" | "upload-file"
   | "social-post" | "social-comment" | "social-react"
@@ -12,7 +12,7 @@ type StepCategory =
   | "content-create" | "content-delete"
   | "messaging" | "generic";
 
-interface StepInfo {
+export interface StepInfo {
   category: StepCategory;
   subject: string;
   verb: string;

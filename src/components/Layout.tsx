@@ -23,7 +23,7 @@ const HOW_IT_WORKS = [
 
 export function Layout() {
   const location = useLocation();
-  const isResultsScreen = location.pathname === "/results";
+  const isResultsScreen = location.pathname === "/results" || location.pathname === "/backlog";
   const [panelOpen, setPanelOpen] = useState(false);
 
   return (

@@ -1,10 +1,12 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router";
-import { ArrowLeft, Check, Copy, Pencil } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Copy, Pencil, Accessibility, Sparkles, ShieldCheck } from "lucide-react";
 import { ToneToggle } from "./ToneToggle";
 import { StateCard } from "./StateCard";
+import { AuditSection } from "./AuditSection";
 import type { State, Tone, FlowSteps } from "../data/states";
-import { generateFlowSteps } from "../utils/flowParser";
+import { generateFlowSteps, parseUserFlow } from "../utils/flowParser";
+import { runExpandedAudit } from "../utils/expandedAudit";
 
 type FilterType = "all" | State["type"];
 
@@ -47,6 +49,26 @@ export function ResultsScreen() {
     const all = flowSteps.flatMap((step) => step.states);
     return { totalCount: all.length, criticalCount: all.filter((s) => s.type === "error").length };
   }, [flowSteps]);
+
+  const audit = useMemo(() => {
+    if (!userFlowInput) return null;
+    return runExpandedAudit(parseUserFlow(userFlowInput));
+  }, [userFlowInput]);
+
+  const auditHighCount = audit?.all.filter((i) => i.severity === "high").length ?? 0;
+
+  const auditCategoryLabel = useMemo(() => {
+    if (!audit) return "";
+    const parts = [
+      audit.accessibility.length > 0 && "accessibility",
+      audit.aiJourney.length > 0 && "AI journey",
+      audit.aiPermissions.length > 0 && "AI permissions",
+      audit.gaps.length > 0 && "suggested additions",
+    ].filter(Boolean) as string[];
+    if (parts.length <= 1) return parts.join("");
+    if (parts.length === 2) return parts.join(" and ");
+    return `${parts.slice(0, -1).join(", ")}, and ${parts[parts.length - 1]}`;
+  }, [audit]);
 
   const handleEditFlow = () => navigate('/');
 
@@ -152,6 +174,27 @@ export function ResultsScreen() {
         </div>
       </div>
 
+      {audit && audit.all.length > 0 && (
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-6 sm:pt-8">
+          <button
+            onClick={() => navigate("/backlog")}
+            className="w-full flex items-center justify-between gap-3 rounded-xl border border-[var(--accent)]/25 bg-[var(--accent-soft)] px-4 sm:px-5 py-3.5 sm:py-4 hover:border-[var(--accent)]/50 transition-colors text-left"
+          >
+            <div className="flex items-center gap-2.5">
+              <Sparkles className="w-4 h-4 text-[var(--accent-hover)] flex-shrink-0" />
+              <span className="text-sm sm:text-base font-medium text-[var(--text-hi)]">
+                AI design backlog: {audit.all.length} finding{audit.all.length === 1 ? "" : "s"} across {auditCategoryLabel}
+                {auditHighCount > 0 && <span className="text-[var(--danger)]"> · {auditHighCount} high priority</span>}
+              </span>
+            </div>
+            <span className="inline-flex items-center gap-1 text-sm font-medium text-[var(--accent-hover)] flex-shrink-0">
+              View backlog
+              <ArrowRight className="w-3.5 h-3.5" />
+            </span>
+          </button>
+        </div>
+      )}
+
       <div
         className={`max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 ${
           visibleSteps.length > 1 ? "lg:grid lg:grid-cols-[180px_1fr] lg:gap-10" : ""
@@ -210,6 +253,35 @@ export function ResultsScreen() {
               </div>
             </section>
           ))}
+
+          {audit && (
+            <div className="mt-4 sm:mt-6">
+              <AuditSection
+                id="accessibility-findings"
+                icon={<Accessibility className="w-4 h-4 text-blue-700" />}
+                accentClass="bg-blue-500/10"
+                title="Accessibility"
+                description="WCAG-grounded findings, matched to each step's UI pattern"
+                items={audit.accessibility}
+              />
+              <AuditSection
+                id="ai-journey-findings"
+                icon={<Sparkles className="w-4 h-4 text-purple-700" />}
+                accentClass="bg-purple-500/10"
+                title="AI journey"
+                description="Missing moments in AI-driven steps, per Microsoft HAX and Google PAIR guidelines"
+                items={audit.aiJourney}
+              />
+              <AuditSection
+                id="ai-permissions-findings"
+                icon={<ShieldCheck className="w-4 h-4 text-teal-700" />}
+                accentClass="bg-teal-500/10"
+                title="AI permissions"
+                description="Consent and data-transparency gaps where AI touches sensitive data"
+                items={audit.aiPermissions}
+              />
+            </div>
+          )}
 
           <div className="mt-12 sm:mt-16 pt-8 sm:pt-12 border-t border-[var(--border)]">
             <div className="text-center">

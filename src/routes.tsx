@@ -3,6 +3,7 @@ import { Layout } from "./components/Layout";
 import { InputScreen } from "./components/InputScreen";
 import { LoadingScreen } from "./components/LoadingScreen";
 import { ResultsScreen } from "./components/ResultsScreen";
+import { BacklogScreen } from "./components/BacklogScreen";
 
 export const router = createBrowserRouter([
   {
@@ -12,6 +13,7 @@ export const router = createBrowserRouter([
       { index: true, Component: InputScreen },
       { path: "loading", Component: LoadingScreen },
       { path: "results", Component: ResultsScreen },
+      { path: "backlog", Component: BacklogScreen },
     ],
   },
 ]);
