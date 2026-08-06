@@ -4,7 +4,10 @@ import { ArrowRight, Clock, Sparkles } from "lucide-react";
 import { SYNTHETIC_FLOWS } from "../data/syntheticFlows";
 import { parseUserFlow } from "../utils/flowParser";
 
-const EXAMPLE_IDS = ["ec-001", "so-001", "pr-001", "hc-001", "ft-001", "fd-001", "tr-001", "ed-001"];
+const EXAMPLE_IDS = [
+  "ec-001", "so-001", "pr-001", "hc-001", "ft-001", "fd-001", "tr-001", "ed-001",
+  "ai-001", "ai-002", "ai-003",
+];
 const EXAMPLES = EXAMPLE_IDS
   .map((id) => SYNTHETIC_FLOWS.find((f) => f.id === id))
   .filter((f): f is NonNullable<typeof f> => Boolean(f));
@@ -187,9 +190,15 @@ export function InputScreen() {
                   setUserFlow(example.steps.join(" → "));
                   focusInput();
                 }}
-                className="text-xs sm:text-sm px-3 py-1.5 rounded-lg border border-[var(--accent)]/25 bg-[var(--accent-soft)] text-[var(--accent-hover)] hover:border-[var(--accent)]/50 hover:bg-[var(--accent)]/15 transition-colors"
+                className="inline-flex items-center gap-1.5 text-xs sm:text-sm px-3 py-1.5 rounded-lg border border-[var(--accent)]/25 bg-[var(--accent-soft)] text-[var(--accent-hover)] hover:border-[var(--accent)]/50 hover:bg-[var(--accent)]/15 transition-colors"
               >
                 {example.flowName}
+                {example.isAI && (
+                  <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-purple-500/15 text-purple-700 border border-purple-500/25">
+                    <Sparkles className="w-2.5 h-2.5" />
+                    AI
+                  </span>
+                )}
               </button>
             ))}
           </div>

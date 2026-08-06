@@ -10,9 +10,47 @@ export interface SyntheticFlow {
   flowName: string;
   steps: string[];
   keywords: string[];
+  isAI?: boolean;
 }
 
 export const SYNTHETIC_FLOWS: SyntheticFlow[] = [
+  // ─── AI (3) ───────────────────────────────────────────────────────────────
+  {
+    id: 'ai-001',
+    appType: 'productivity',
+    flowName: 'Chat with AI support assistant',
+    steps: [
+      'User opens the support chat and asks the assistant a question',
+      'Assistant generates a response to the question',
+      'User continues the conversation with follow-up questions',
+    ],
+    keywords: ['chatbot', 'assistant', 'support', 'conversation', 'help'],
+    isAI: true,
+  },
+  {
+    id: 'ai-002',
+    appType: 'social',
+    flowName: 'AI-generated photo caption',
+    steps: [
+      'User uploads a photo to share',
+      'AI analyzes the photo and suggests a caption',
+      'User edits the caption and posts it',
+    ],
+    keywords: ['ai', 'photo', 'caption', 'analyze', 'suggest'],
+    isAI: true,
+  },
+  {
+    id: 'ai-003',
+    appType: 'fitness',
+    flowName: 'AI-personalized workout plan',
+    steps: [
+      'User completes a fitness assessment',
+      'AI recommends a personalized workout plan',
+      'User starts the first workout',
+    ],
+    keywords: ['ai', 'recommend', 'personalize', 'workout', 'fitness'],
+    isAI: true,
+  },
   // ─── ECOMMERCE (10) ───────────────────────────────────────────────────────
   {
     id: 'ec-001',
